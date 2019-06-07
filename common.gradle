@@ -5,7 +5,8 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
-group = 'org.jmonkeyengine'
+//change name for pom.xml dependency
+group = 'org.jmonkeyengine-custom'
 version = jmePomVersion
 
 sourceCompatibility = '1.8'

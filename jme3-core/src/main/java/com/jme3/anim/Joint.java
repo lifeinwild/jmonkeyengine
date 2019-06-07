@@ -339,4 +339,7 @@ public class Joint implements Savable, JmeCloneable, HasLocalTransform {
         output.writeSavableArrayList(new ArrayList(children), "children", null);
     }
 
+    public Transform getInitialTransform() {
+        return initialTransform;
+    }
 }

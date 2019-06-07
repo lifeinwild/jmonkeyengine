@@ -252,7 +252,9 @@ public class TransformTrack implements AnimTrack<Transform> {
 
         Transform interpolated = interpolator.interpolate(blend, startFrame, translations, rotations, scales, times);
 
-        if (translations != null) {
+        //the second condition is for bvh support. bvh may not have POSITION information.
+        //TODO Currently, "move to coordinate zero" and "do not move" can not be distinguished.
+        if (translations != null && !Vector3f.ZERO.equals(interpolated.getTranslation())) {
             transform.setTranslation(interpolated.getTranslation());
         }
         if (rotations != null) {

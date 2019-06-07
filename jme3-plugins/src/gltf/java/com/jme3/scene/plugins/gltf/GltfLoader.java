@@ -192,6 +192,15 @@ public class GltfLoader implements AssetLoader {
         }
         rootNode.getChild(activeChild).setCullHint(Spatial.CullHint.Inherit);
     }
+    
+    public Joint readNodeAsBone(int nodeIndex) throws IOException {
+        Object tmp = readNode(nodeIndex);
+        if (tmp == null || !(tmp instanceof JointWrapper)) {
+            return null;
+        }
+        JointWrapper jw = (JointWrapper) tmp;
+        return jw.joint;
+    }
 
     public Object readNode(int nodeIndex) throws IOException {
         Object obj = fetchFromCache("nodes", nodeIndex, Object.class);
