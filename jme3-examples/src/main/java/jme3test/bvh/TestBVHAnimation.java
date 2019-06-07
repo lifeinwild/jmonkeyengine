@@ -62,68 +62,25 @@ public class TestBVHAnimation extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-
         final String animName = "ballerina";
-        //final String animName = "85_07";
 
         assetManager.registerLoader(BVHLoader.class, "bvh", "BVH");
 
         BVHAnimData animData = (BVHAnimData) assetManager.loadAsset("Animations/" + animName + ".bvh");
 
-        for (AnimTrack e : animData.getAnimation().getTracks()) {
-            TransformTrack tt = (TransformTrack) e;
-            Joint j = (Joint) tt.getTarget();
-            Vector3f [] translations = new Vector3f[tt.getTranslations().length];
-            Quaternion [] empRot = new Quaternion[tt.getRotations().length];
-            for (int frame = 0; frame < tt.getTranslations().length; frame++) {
-                translations[frame] = Vector3f.ZERO;
-                empRot[frame] = Quaternion.ZERO;
-            }
-                tt.setKeyframesTranslation(translations);
-//                tt.setKeyframesRotation(empRot);
-
-            System.out.println(
-                    j.getName() + "  " + j.getId()
-                    + System.lineSeparator() + tt.getRotations()[0] + "  "
-                    + System.lineSeparator() + "null  "
-                    + System.lineSeparator() + tt.getTranslations()[0] + "  "
-                    + System.lineSeparator() + j.getLocalRotation() + "  "
-                    + System.lineSeparator() + j.getLocalScale() + "  "
-                    + System.lineSeparator() + j.getLocalTranslation() + "  "
-                    + System.lineSeparator() + j.getModelTransform().getRotation()
-                    + System.lineSeparator() + j.getModelTransform().getScale()
-                    + System.lineSeparator() + j.getModelTransform().getTranslation()
-            );
-        }
-
         initHud(animName + ".bvh");
 
-        //ArmatureDebugAppState debugAppState = new ArmatureDebugAppState();
-        //stateManager.attach(debugAppState);
-        //debugAppState .setEnabled(true);
         //SkinningControl sc = new SkinningControl(animData.getSkeleton());
         ArmatureDebugger ad = new ArmatureDebugger(animData.getAnimation().getName(),
                 animData.getSkeleton(), animData.getSkeleton().getJointList());
-        
+
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.getAdditionalRenderState().setWireframe(true);
         mat.setColor("Color", ColorRGBA.White);
         mat.getAdditionalRenderState().setDepthTest(false);
         ad.setMaterial(mat);
         rootNode.attachChild(ad);
-        //ad.addControl(sc);
-        //debugAppState.addArmatureFrom(sc);
 
-
-        /*
-
-        SkeletonDebugger3_3  skeletonDebug = new SkeletonDebugger3_3 ("skeleton", animData.getSkeleton());
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.getAdditionalRenderState().setWireframe(true);
-        mat.setColor("Color", ColorRGBA.White);
-        mat.getAdditionalRenderState().setDepthTest(false);
-        skeletonDebug.setMaterial(mat);
-         */
         AnimComposer ctrl = new AnimComposer();
         ctrl.setEnabled(true);
         ctrl.addAnimClip(animData.getAnimation());
@@ -131,7 +88,6 @@ public class TestBVHAnimation extends SimpleApplication {
 
         ctrl.setCurrentAction(animData.getAnimation().getName());
         ctrl.setGlobalSpeed(1f);
-        //rootNode.attachChild(ad);
 
         flyCam.setMoveSpeed(50);
         cam.setLocation(new Vector3f(45.214333f, 15.7383585f, 140.1217f));

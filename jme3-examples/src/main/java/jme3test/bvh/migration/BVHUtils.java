@@ -123,8 +123,6 @@ public class BVHUtils {
     public static AnimClip reTarget(Spatial src, Spatial target, Armature targetArmature, AnimClip srcAnim, Armature srcArmature, float timePerFrame, SkeletonMapping skMap, boolean skipFirstKey) {
         int start = skipFirstKey ? 1 : 0;
 
-//        Animation sourceAnimation = sourceData.getAnimation();
-//        Skeleton sourceSkeleton = sourceData.getSkeleton();
         AnimClip rAnim = new AnimClip(srcAnim.getName());
 
         targetArmature.update();
@@ -140,13 +138,7 @@ public class BVHUtils {
 
         Vector3f rootPos = new Vector3f();
         Quaternion rootRot = new Quaternion();
-        /*
-        //dbg
-        for(Joint j : targetArmature.getJointList()){
-            System.out.println(j.getName() + " " + j.getLocalTransform().getRotation());
-        }
-        //dbg
-         */
+        
         targetArmature.applyBindPose();
         //dbg start
         for (Joint j : targetArmature.getJointList()) {
@@ -165,16 +157,9 @@ public class BVHUtils {
                     break;
                 default:
             }
-            int aaa = 0;
         }
         //dbg end
-        /*
-        //dbg
-        for(Joint j : targetArmature.getJointList()){
-            System.out.println(j.getName() + " " + j.getLocalTransform().getRotation());
-        }
-        //dbg
-         */
+
         Armature targetArmatureBind = cloneArmature(targetArmature);
         srcArmature.applyBindPose();
         Armature srcArmatureBind = cloneArmature(srcArmature);

@@ -71,20 +71,13 @@ public class TestAutoRetarget extends SimpleApplication {
         assetManager.registerLoader(BVHLoader.class, "bvh", "BVH");
         final String animName = "ballerina";
         BVHAnimData animData = (BVHAnimData) assetManager.loadAsset("Animations/" + animName + ".bvh");
-        initHud(animName + ".bvh");
         createLights();
 
         Node model = (Node) assetManager.loadModel("Models/Sinbad/Sinbad.mesh.xml");
-        //    Node model = (Node) assetManager.loadModel("Models/Oto/Oto.mesh.xml");
         rootNode.attachChild(model);
         AnimComposer control = model.getControl(AnimComposer.class);
         SkinningControl sinbadSkinCtrl = model.getControl(SkinningControl.class);
 
-        /*
-        Node model2 = (Node) assetManager.loadModel("Models/Jaime/Jaime.j3o");
-        rootNode.attachChild(model2);
-        AnimComposer control2 = model2.getControl(AnimComposer.class);
-         */
         float targetHeight = ((BoundingBox) model.getWorldBound()).getYExtent();//BVHUtils.getSkeletonHeight(control.getSkeleton());
         float sourceHeight = BVHUtils.getSkeletonHeight(animData.getSkeleton());
         float ratio = targetHeight / sourceHeight;
@@ -93,7 +86,6 @@ public class TestAutoRetarget extends SimpleApplication {
 
         SkeletonMapping skMap = new SkeletonMapping();
         //Sinbad - Ballerina
-
         /*
         skMap.map("Root", "Hips");
         skMap.map("Stomach", "Chest");
@@ -114,10 +106,6 @@ public class TestAutoRetarget extends SimpleApplication {
         skMap.map("Foot.L", "LeftFoot", new Quaternion().fromAngleAxis(HALF_PI / 3, UNIT_X));
         skMap.map("Foot.R", "RightFoot", new Quaternion().fromAngleAxis(HALF_PI / 3, UNIT_X));
 */
-        //sinbadSkinCtrl.getArmature().applyBindPose();
-//        final AnimChannel channel = control.createChannel();
-//        control.addListener(this);
-        //no rotation correction
         
         skMap.map("Root", "Hips", PI, UNIT_Y);
         skMap.map("Stomach", "Chest", PI, UNIT_Y);
@@ -141,113 +129,8 @@ public class TestAutoRetarget extends SimpleApplication {
         control.addAnimClip(BVHUtils.reTarget2(model, model, sinbadSkinCtrl.getArmature(), animData.getAnimation(), animData.getSkeleton(), animData.getTimePerFrame(), skMap, false));
         control.setCurrentAction(animName);
 
-        //   SkeletonDebugger skeletonDebug = new SkeletonDebugger("skeleton", control.getSkeleton(), assetManager, false);
-//        debugAppState.addSkeleton("SinbadSkeleton", control.getSkeleton(), false);
-        //FIXME it shouldn't be model here as first argument.
         SkeletonMapping skMap2 = null;
 
-        try {
-            /*
-            MappingCtx targetM = SkeletonMappingUtil.autoSkeletonMappingAsHuman(control.getSkeleton());
-            MappingCtx srcM = SkeletonMappingUtil.autoSkeletonMappingAsHuman(animData.getSkeleton());
-            MappingCtx targetM2 = SkeletonMappingUtil.autoSkeletonMappingAsHuman(control2.getSkeleton());
-            Object o = targetM.getAllBone().get("Waist");
-             */
- /*
-            skMap2 = SkeletonMappingUtil.mapping(animData.getSkeleton(), srcM, targetM);
-            //rotation for gegina
-            skMap2.get("Root").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Y));
-            //skMap2.map("Stomach", "Chest");
-            skMap2.get("Stomach").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Y));
-            skMap2.get("Neck").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Y));
-            skMap2.get("Head").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Y));
-            skMap2.get("Waist").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_X));
-
-            skMap2.get("Clavicle.L").setTwist(new Quaternion().fromAngleAxis(-HALF_PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            skMap2.get("Clavicle.R").setTwist(new Quaternion().fromAngleAxis(HALF_PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-
-            skMap2.get("Humerus.L").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            skMap2.map("Humerus.L", "aaa");
-            skMap2.get("Humerus.R").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            skMap2.map("Humerus.R", "aaa");
-            skMap2.get("Ulna.L").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            skMap2.map("Ulna.L", "aaa");
-            skMap2.get("Ulna.R").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            skMap2.map("Ulna.R", "aaa");
-            skMap2.get("Hand.L").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            skMap2.map("Hand.L", "aaa");
-            skMap2.get("Hand.R").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_Z).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            skMap2.map("Hand.R", "aaa");
-
-            skMap2.get("Thigh.L").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-//            skMap2.map("Thigh.L", "aaa");
-            skMap2.get("Thigh.R").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            //skMap2.map("Thigh.R", "aaa");
-            skMap2.get("Calf.L").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-//            skMap2.map("Calf.L", "aaa");
-            skMap2.get("Calf.R").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            //skMap2.map("Calf.R", "aaa");
-            skMap2.get("Foot.L").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-//            skMap2.map("Foot.L", "aaa");
-            skMap2.get("Foot.R").setTwist(new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
-            //skMap2.map("Foot.R", "aaa");
-            //rotation for gegina
-             */
-            //dbg pring
-            /*
-            List<String> boneNames = new ArrayList<>();
-            boneNames.add("Root");
-            boneNames.add("Stomach");
-            boneNames.add("Neck");
-            boneNames.add("Head");
-            boneNames.add("Clavicle.L");
-            boneNames.add("Clavicle.R");
-            boneNames.add("Humerus.L");
-            boneNames.add("Humerus.R");
-            boneNames.add("Ulna.L");
-            boneNames.add("Ulna.R");
-            boneNames.add("Hand.L");
-            boneNames.add("Hand.R");
-            boneNames.add("Thigh.L");
-            boneNames.add("Thigh.R");
-            boneNames.add("Calf.L");
-            boneNames.add("Calf.R");
-            boneNames.add("Foot.L");
-            boneNames.add("Foot.R");
-
-            for (String boneName : boneNames) {
-                BoneMapping bm1 = skMap.get(boneName);
-                BoneMapping bm2 = skMap2.get(boneName);
-                if (bm1 == null || bm2 == null) {
-                    if (bm1 == null && bm2 == null) {
-                        continue;
-                    }
-                    System.out.println("bm1 or bm2 is null");
-                    continue;
-                }
-                if (!bm1.getSourceNames().get(0).equals(bm2.getSourceNames().get(0))) {
-                    System.out.println("not equa name");
-                    continue;
-                }
-                if (!bm1.getTwist().equals(bm2.getTwist())) {
-                    System.out.println("not equa twist");
-                }
-
-            }
-             */
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-        }
-
-        /*
-        SkeletonDebugAppState3_3 debugAppState = new SkeletonDebugAppState3_3();
-        stateManager.attach(debugAppState);
-        debugAppState.addSkeleton("SinbadSkeleton", control.getSkeleton(), false);
-        //FIXME it shouldn't be model here as first argument.
-        control.addAnim(BVHUtils.reTarget(model, model, animData.getAnimation(), animData.getSkeleton(), animData.getTimePerFrame(), skMap2, false));
-        final AnimChannel channel = control.createChannel();
-        control.addListener(this);
-         */
         flyCam.setEnabled(false);
         ChaseCamera chaseCam = new ChaseCamera(cam, inputManager);
         chaseCam.setDefaultHorizontalRotation(HALF_PI);
@@ -281,92 +164,6 @@ public class TestAutoRetarget extends SimpleApplication {
         Geometry geo = new Geometry(name, axis);
         geo.setMaterial(m);
         return geo;
-    }
-
-    private void initHud(String text) {
-        /**
-         * Write text on the screen (HUD)
-         */
-        // guiNode.detachAllChildren();
-//        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-//        BitmapText helloText = new BitmapText(guiFont, false);
-//        helloText.setSize(guiFont.getCharSet().getRenderedSize());
-//        helloText.setText(text);
-//        helloText.setLocalTranslation(settings.getWidth() / 2 - helloText.getLineWidth() / 2, helloText.getLineHeight(), 0);
-//        guiNode.attachChild(helloText);
-    }
-
-    public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
-//        if (animName.equals("ballerina")) {
-//            channel.setAnim(poseAnim, 0.50f);
-//            channel.setLoopMode(LoopMode.Loop);
-//            channel.setSpeed(1f);
-//        }
-    }
-
-    public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
-    }
-
-    private AnimChannel createAnimSkeleton(BVHAnimData animData, float scale, String animName) {
-        //      SkeletonDebugger skeletonDebug = new SkeletonDebugger("skeleton", animData.getSkeleton(), assetManager, true);
-
-        //  
-        /*
-        SkeletonDebugger3_3 skeletonDebug = stateManager.getState(SkeletonDebugAppState3_3.class).addSkeleton("skeleton", animData.getSkeleton(), true);
-        skeletonDebug.setLocalScale(scale);
-
-        skeletonDebug.setLocalTranslation(7, 0, 0);
-
-        HashMap<String, Animation> anims = new HashMap<String, Animation>();
-        anims.put(animData.getAnimation().getName(), animData.getAnimation());
-
-        AnimControl ctrl = new AnimControl(animData.getSkeleton());
-        ctrl.setAnimations(anims);
-        skeletonDebug.addControl(ctrl);
-
-        for (String anim : ctrl.getAnimationNames()) {
-            System.out.println(anim);
-        }
-
-        ctrl.addListener(this);
-        AnimChannel channel = ctrl.createChannel();
-//        channel.setAnim(animName);
-//        channel.setLoopMode(LoopMode.Cycle);
-//        channel.setSpeed(1f);
-        return channel;
-         */
-        return null;//dbg 
-    }
-
-    private void createBindPose(Mesh mesh) {
-        VertexBuffer pos = mesh.getBuffer(Type.Position);
-        if (pos == null || mesh.getBuffer(Type.BoneIndex) == null) {
-            // ignore, this mesh doesn't have positional data
-            // or it doesn't have bone-vertex assignments, so its not animated
-            return;
-        }
-
-        VertexBuffer bindPos = new VertexBuffer(Type.BindPosePosition);
-        bindPos.setupData(Usage.CpuOnly,
-                3,
-                Format.Float,
-                BufferUtils.clone(pos.getData()));
-        mesh.setBuffer(bindPos);
-
-        // XXX: note that this method also sets stream mode
-        // so that animation is faster. this is not needed for hardware skinning
-        pos.setUsage(Usage.Stream);
-
-        VertexBuffer norm = mesh.getBuffer(Type.Normal);
-        if (norm != null) {
-            VertexBuffer bindNorm = new VertexBuffer(Type.BindPoseNormal);
-            bindNorm.setupData(Usage.CpuOnly,
-                    3,
-                    Format.Float,
-                    BufferUtils.clone(norm.getData()));
-            mesh.setBuffer(bindNorm);
-            norm.setUsage(Usage.Stream);
-        }
     }
 
     protected void setUpCamInput(Node model) {
