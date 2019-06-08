@@ -45,22 +45,59 @@ public class BVHUtils {
                 continue;
             }
             Joint srcJ = (Joint) tt.getTarget();
+            if (srcJ == null) {
+                continue;
+            }
             BoneMapping bm = skMap.getInv(srcJ.getName());
             if (bm == null) {
                 System.out.println("BoneMapping not found " + srcJ.getName());
                 continue;
             }
             Joint targetJ = targetArmature.getJoint(bm.getTargetName());
-
-            TransformTrack rtt = new TransformTrack();
-            //dbg start
-            Vector3f[] translations = new Vector3f[tt.getTranslations().length];
-            for (int j = 0; j < translations.length; j++) {
-                translations[j] = Vector3f.ZERO;
+            if (targetJ == null) {
+                continue;
             }
 
-            rtt.setKeyframes(tt.getTimes(), translations, tt.getRotations(), tt.getScales());
-            //dbg end
+            Vector3f cnvPos = targetJ.getLocalTranslation().subtract(srcJ.getLocalTranslation());
+            Quaternion cnvRot = targetJ.getLocalRotation().mult(srcJ.getLocalRotation().inverse());
+            Vector3f cnvScale = targetJ.getLocalScale().divide(srcJ.getLocalScale());
+
+            TransformTrack rtt = new TransformTrack();
+            int size = tt.getTimes().length;
+            rtt.setTimes(tt.getTimes());
+            if (tt.getTranslations() != null) {
+                Vector3f[] translations = new Vector3f[size];
+                for (int j = 0; j < translations.length; j++) {
+                    if (translations[j] == null) {
+                        translations[j] = Vector3f.ZERO;
+                    }
+                    translations[j].add(cnvPos);
+                }
+                rtt.setKeyframesTranslation(translations);
+            }
+
+            if (tt.getScales() != null) {
+                Vector3f[] scales = new Vector3f[size];
+                for (int j = 0; j < scales.length; j++) {
+                    if (scales[j] == null) {
+                        scales[j] = Vector3f.UNIT_XYZ;
+                    }
+                    scales[j].multLocal(cnvScale);
+                }
+                rtt.setKeyframesScale(scales);
+            }
+
+            if (tt.getRotations() != null) {
+                Quaternion[] rots = new Quaternion[size];
+                for (int j = 0; j < rots.length; j++) {
+                    if (rots[j] == null) {
+                        rots[j] = Quaternion.IDENTITY;
+                    }
+                    rots[j].multLocal(cnvRot);
+                }
+                rtt.setKeyframesRotation(rots);
+            }
+
             rtt.setTarget(targetJ);
             rTracks[frame++] = rtt;
         }
@@ -133,12 +170,12 @@ public class BVHUtils {
         float targetDepth = ((BoundingBox) target.getWorldBound()).getZExtent() / target.getWorldScale().z;
         float sourceDepth = ((BoundingBox) src.getWorldBound()).getZExtent() / src.getWorldScale().z;
         Vector3f ratio = new Vector3f(targetHeight / sourceHeight, targetWidth / sourceWidth, targetDepth / sourceDepth);
-        ratio = Vector3f.UNIT_XYZ;
+        ratio = Vector3f.UNIT_XYZ;//TODO overwrite
         System.out.println(ratio);
 
         Vector3f rootPos = new Vector3f();
         Quaternion rootRot = new Quaternion();
-        
+
         targetArmature.applyBindPose();
         //dbg start
         for (Joint j : targetArmature.getJointList()) {
@@ -226,7 +263,7 @@ public class BVHUtils {
             Joint j = (Joint) tt.getTarget();
             System.out.println(
                     j.getName() + "  " + j.getId()
-                    + System.lineSeparator() + tt.getRotations()[0] + "  "
+                    + System.lineSeparator() + (tt.getRotations() == null ? "" : tt.getRotations()[0]) + "  "
                     + System.lineSeparator() + (tt.getScales() == null ? "" : tt.getScales()[0]) + "  "
                     + System.lineSeparator() + (tt.getTranslations() == null ? "" : tt.getTranslations()[0]) + "  "
                     + System.lineSeparator() + j.getLocalRotation() + "  "
@@ -297,7 +334,7 @@ public class BVHUtils {
                 //case of a root bone, just combine the source model transforms with the inverse target bind transforms                
                 InnerTrack t = getInnerTrack(targetBone, tracks, animLength);
                 //scaling the modelPosition
-                Vector3f scaledPos = sourceBone.getLocalTransform().getTranslation().mult(ratio);
+                Vector3f scaledPos = sourceBone.getLocalTransform().getTranslation().mult(ratio);//TODO not used
                 //subtract target's bind position to the source's scaled model position
                 t.positions[frameId] = new Vector3f();//scaledPos.subtractLocal(targetBone.getBindPosition());
                 // t.positions[frameId] = new Vector3f();
@@ -330,7 +367,7 @@ public class BVHUtils {
                 } else {
                     t.positions[frameId] = new Vector3f();
                 }
-                t.positions[frameId] = new Vector3f();
+                t.positions[frameId] = new Vector3f();//TODO overwrite
 
                 TempVars vars = TempVars.get();
 //                // computing target's parent's inverse model rotation

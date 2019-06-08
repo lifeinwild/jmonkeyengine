@@ -157,7 +157,7 @@ public class TestAutoRetarget extends SimpleApplication {
         skMap.map("Foot.L", "LeftFoot", new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
         skMap.map("Foot.R", "RightFoot", new Quaternion().fromAngleAxis(PI, UNIT_X).mult(new Quaternion().fromAngleAxis(PI, UNIT_Y)));
          
-        control.addAnimClip(BVHUtils.reTarget2(model, model, sinbadSkinCtrl.getArmature(), animData.getAnimation(), animData.getSkeleton(), animData.getTimePerFrame(), skMap, false));
+        control.addAnimClip(BVHUtils.reTarget(model, model, sinbadSkinCtrl.getArmature(), animData.getAnimation(), animData.getSkeleton(), animData.getTimePerFrame(), skMap, false));
         control.setCurrentAction(animName);
 
         SkeletonMapping skMap2 = null;
